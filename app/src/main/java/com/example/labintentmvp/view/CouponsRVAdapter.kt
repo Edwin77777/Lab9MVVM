@@ -1,5 +1,6 @@
 package com.example.labintentmvp.view
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -68,10 +69,10 @@ class CouponsRVAdapter (couponsList: ArrayList<Offer>):
         }
 
         override fun onClick(v: View?) {
-            /*      val intent = Intent(itemView.context, DetailActivity::class.java)
-             intent.putExtra("movie", movie)
-             intent.putExtra("envia","list")
-             itemView.context.startActivity(intent)*/
+
+            val intent = Intent(itemView.context, DetailActivity::class.java)
+            intent.putExtra("coupon", coupon)
+            itemView.context.startActivity(intent)
         }
 
     }

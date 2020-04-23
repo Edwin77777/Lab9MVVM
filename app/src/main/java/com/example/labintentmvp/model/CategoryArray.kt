@@ -2,6 +2,7 @@ package com.example.labintentmvp.model
 
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 data class CategoryArray(
     @SerializedName("Electronics and Gadgets")
@@ -26,4 +27,4 @@ data class CategoryArray(
     val stationary: List<String>,
     @SerializedName("Travel")
     val travel: List<String>
-)
+) :Serializable
