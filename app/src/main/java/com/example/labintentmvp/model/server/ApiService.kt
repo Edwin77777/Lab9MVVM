@@ -1,5 +1,6 @@
-package com.example.labintentmvp.model
+package com.example.labintentmvp.model.server
 
+import com.example.labintentmvp.model.Coupons
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call

@@ -4,77 +4,67 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
+import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
+import com.example.labintentmvp.BR
 import com.example.labintentmvp.R
 import com.example.labintentmvp.model.Offer
+import com.example.labintentmvp.viewmodel.CouponViewModel
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.coupons_list_item.view.*
 
-class CouponsRVAdapter (couponsList: ArrayList<Offer>):
+class CouponsRVAdapter (var couponViewModel: CouponViewModel):
     RecyclerView.Adapter<CouponsRVAdapter.CouponsViewHolder>() {
 
-    private var couponsList = ArrayList<Offer>()
+    private var couponsList: List<Offer>? = null
 
-    init {
-        this.couponsList = couponsList
+    fun setCouponsList(coupons: List<Offer>) {
+        this.couponsList = coupons
     }
 
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
-    ): CouponsViewHolder {
-        val itemView =
-            LayoutInflater.from(parent.context).inflate(R.layout.coupons_list_item, parent, false)
-        return CouponsViewHolder(
-            itemView
-        )
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CouponsViewHolder {
+        val layoutInflater: LayoutInflater = LayoutInflater.from(parent.context)
+        val binding: ViewDataBinding =
+            DataBindingUtil.inflate(layoutInflater, viewType, parent, false)
+        return CouponsViewHolder(binding)
 
     }
 
-    override fun getItemCount(): Int = couponsList.size
+    override fun getItemCount(): Int = couponsList?.size ?: 0
 
     override fun onBindViewHolder(holder: CouponsViewHolder, position: Int) {
-        val coupon = couponsList[position]
-        holder.setCoupon(coupon)
+        holder.setCoupon(couponViewModel, position)
     }
 
-    class CouponsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
-            View.OnClickListener {
+    override fun getItemViewType(position: Int): Int {
+        return getLayoutIdForPosition(position)
+    }
 
-        private var coupon: Offer? = null
+    private fun getLayoutIdForPosition(position: Int): Int {
+        return R.layout.coupons_list_item
+
+    }
+
+
+    class CouponsViewHolder(binding: ViewDataBinding) : RecyclerView.ViewHolder(binding.root) {
+
+
+        private var binding: ViewDataBinding? = null
 
         init {
-            itemView.setOnClickListener(this)
+            this.binding = binding
         }
 
-        fun setCoupon(coupon: Offer) {
-            this.coupon = coupon
-
-            //val URL_IMAGES = "https://image.tmdb.org/t/p/w500"
-
-            itemView.tv_title.text = coupon.title
-            itemView.tv_descrip.text = coupon.description
-            itemView.tv_offer_value.text = coupon.offerValue
-            itemView.tv_end_date.text = "hurry up the end date is: " + coupon.endDate
-            itemView.tv_store.text = "STORE: " + coupon.store
-            itemView.tv_categories.text = coupon.categories
-
-            if (!coupon.imageUrl.isNullOrEmpty()) {
-                Picasso.get().load(coupon.imageUrl).into(itemView.iv_picture)
-                //Glide.with(itemView.context).load(URL_IMAGES + movie.posterPath).into(itemView.iv_picture)
-            }//else{
-             //   itemView.iv_picture.visibility = View.GONE
-            //}
-
+        fun setCoupon(couponViewModel: CouponViewModel, position: Int) {
+            binding?.setVariable(BR.model, couponViewModel)
+            binding?.setVariable(BR.position, position)
         }
 
-        override fun onClick(v: View?) {
 
-            val intent = Intent(itemView.context, DetailActivity::class.java)
-            intent.putExtra("coupon", coupon)
-            itemView.context.startActivity(intent)
-        }
+
 
     }
+
 
 }

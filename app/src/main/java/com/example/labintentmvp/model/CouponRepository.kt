@@ -1,6 +1,9 @@
 package com.example.labintentmvp.model
 
+import androidx.lifecycle.MutableLiveData
+
 interface CouponRepository {
 
-    fun loadListCoupons()
+    fun callCouponsAPI()
+    fun getCoupons() : MutableLiveData<List<Offer>>
 }

@@ -1,61 +1,67 @@
 package com.example.labintentmvp.view
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Message
 import android.util.Log
 import android.widget.Toast
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.labintentmvp.R
-import com.example.labintentmvp.model.ApiService
-import com.example.labintentmvp.model.Coupons
+import com.example.labintentmvp.databinding.ActivityMainBinding
 import com.example.labintentmvp.model.Offer
-import com.example.labintentmvp.presenter.CouponPresenter
-import com.example.labintentmvp.presenter.CouponPresenterImpl
+import com.example.labintentmvp.viewmodel.CouponViewModel
 import kotlinx.android.synthetic.main.activity_main.*
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
-class MainActivity : AppCompatActivity(), CouponView {
+class MainActivity : AppCompatActivity() {
 
-    private var couponPresenter: CouponPresenter ?= null
-    private var listCoupons = ArrayList<Offer>()
+    private var couponViewModel: CouponViewModel? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        couponPresenter = CouponPresenterImpl(this)
+        setupBinding(savedInstanceState)
 
-        loadList()
-    }
 
-    fun loadList() {
-
-        couponPresenter?.loadListCoupons()
 
     }
 
-    override fun showErrorLoadCoupons(message: String?){
-        Toast.makeText(this,message, Toast.LENGTH_SHORT).show()
+    fun setupBinding (savedInstanceState: Bundle?){
+
+
+        var activityMainBinding: ActivityMainBinding =
+            DataBindingUtil.setContentView(this, R.layout.activity_main)
+
+        couponViewModel = ViewModelProvider(this).get(CouponViewModel::class.java)
+
+        activityMainBinding.model = couponViewModel
+        setUpListUpdate()
+
     }
 
-    override fun showListCoupons(coupons: ArrayList<Offer>){
+    private fun setUpListUpdate() {
+        couponViewModel?.callCoupons()
 
-        listCoupons= coupons
+        couponViewModel?.getCoupons()?.observe(this, Observer {coupon ->
+            Log.d("Coupon", coupon[0].title)
+            couponViewModel?.setCouponsInCouponsAdapter(coupon)
 
-        recyclerView.setHasFixedSize(true)
+        })
+        setupListClick()
+    }
 
-        recyclerView.layoutManager = LinearLayoutManager(
-            this,
-            RecyclerView.VERTICAL,
-            false
-        )
+    fun setupListClick(){
+        couponViewModel?.getCouponSelected()?.observe(this, Observer {coupon ->
+            val intent = Intent(this, DetailActivity::class.java)
+            intent.putExtra("coupon", coupon)
+            startActivity(intent)
 
-        val couponsRVAdapter = CouponsRVAdapter(listCoupons as ArrayList<Offer>)
-        recyclerView.adapter = couponsRVAdapter
+        })
     }
 
 
